@@ -1,5 +1,42 @@
+## Rag sobre Elasticsearch
 
-## TRANSACCIONES
+- Chat interactivo sobre las transacciones de un usuario. Se podrán realizar preguntas sobre las transacciones y el `Agente Bancario`
+te contestará
+
+- Las transacciones se encuentran en un fichero tx.json, cada linea representa una transacción en formato json
+
+- Al arrancar la aplicación se lee este fichero y por cada linea (transacción) se construye un resumen con los datos más relevantes, se genera un 'embedding' (un vector con su representación)
+y se inserta en Elasticsearch
+
+```json
+{
+  "vector": [
+    -0.011392268,
+    -0.01085579,
+    ....
+    -0.025077717,
+    0.019513072,
+    0.013001702
+  ],
+  "text": "Transacción: 0e86dbc4-c86b-11e8-a8d5-f2801f1b9fd1, Tipo: TRANSFER, Emisor: María Núñez García, Beneficiario: Irene Sanz Castro, Monto: 745.00 EUR, Fecha: 2018-10-05T02:36:24.803, Concepto: Alquiler Piso, Comercio: , Ciudad: ",
+  "metadata": {
+    "transaction_id": "0e86dbc4-c86b-11e8-a8d5-f2801f1b9fd1",
+    "transaction_json": "{\"transaction_id\":\"0e86dbc4-c86b-11e8-a8d5-f2801f1b9fd1\",\"account_id\":\"756e0d28-333f-453a-99a1-394e8a332d74\",\"reference\":\"Alquiler Piso\",\"transaction_subtype\":\"TRANSFER_ISSUED\",\"issuer\":\"María Núñez García\",\"beneficiary\":\"Irene Sanz Castro\",\"operation_date\":\"2018-10-05T02:36:24.803\",\"amount\":745.0,\"currency_code\":\"EUR\",\"entry_type\":\"DEBIT\",\"transaction_type\":\"TRANSFER\"}"
+  }
+}
+
+```
+
+- Por cada consulta que realiza el usuario se genera un 'embedding' con el se realiza la consulta a Elasticsearch y con estos resultados se realiza
+la consulta al LLM.
+
+## Como arrancar la aplicación
+
+```
+mvn spring-boot:run -Dspring-boot.run.arguments="--open-ai.secret.key=my api key"
+```
+
+## Juego de datos
 
 | transaction_id | account_id | reference | transaction_subtype | issuer | beneficiary | operation_date | amount | currency_code | entry_type | transaction_type | customerId | cardAcceptorName | category | creditor | debtor |
 |----------------|------------|-----------|---------------------|--------|-------------|----------------|--------|---------------|------------|------------------|------------|------------------|----------|----------|--------|
